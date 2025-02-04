@@ -20,11 +20,9 @@ string accessToken;
 using (var client = new HttpClient())
 {
     var content = new FormUrlEncodedContent([
-        new KeyValuePair<string, string>("grant_type", "password"),
+        new KeyValuePair<string, string>("grant_type", "client_credentials"),
         new KeyValuePair<string, string>("client_id", clientId),
         new KeyValuePair<string, string>("client_secret", clientSecret),
-        new KeyValuePair<string, string>("username", username),
-        new KeyValuePair<string, string>("password", password)
     ]);
 
     var response = await client.PostAsync(tokenUrl, content);
