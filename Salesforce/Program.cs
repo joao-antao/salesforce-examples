@@ -16,7 +16,7 @@ var objectName = "YOUR_OBJECT_NAME";
 string instanceUrl;
 string accessToken;
 
-// Authenticate using OAuth2 protocol with grant type: password
+// Authenticate using OAuth2 protocol with grant type: client credentials
 using (var client = new HttpClient())
 {
     var content = new FormUrlEncodedContent([
@@ -45,19 +45,36 @@ using (var client = new HttpClient())
     instanceUrl = salesforceAccessToken.InstanceUrl;
 
     Console.WriteLine("Authentication successful!");
-    Console.WriteLine($"Access Token: {salesforceAccessToken}");
+    Console.WriteLine($"Access Token: {salesforceAccessToken.AccessToken}");
+}
+
+// Get objects
+using (var client = new HttpClient())
+{
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+    var apiUrl = $"{instanceUrl}/services/data/v58.0/sobjects/account/";
+
+    var response = await client.GetAsync(apiUrl);
+    var responseString = await response.Content.ReadAsStringAsync();
+
+    if (!response.IsSuccessStatusCode)
+    {
+        Console.WriteLine($"Error getting account: {responseString}");
+        return;
+    }
+
+    Console.WriteLine($"Account fetch successfully: {responseString}");
 }
 
 // Create object
 using (var client = new HttpClient())
 {
     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-    var apiUrl = $"{instanceUrl}/services/data/v58.0/sobjects/Account/";
+    var apiUrl = $"{instanceUrl}/services/data/v58.0/sobjects/account/";
 
     var accountData = new
     {
-        Name = "Kramerica Industries",
-        Industry = "Seinfeld"
+        Name = "Test Kramerica Industries",
     };
 
     var json = JsonSerializer.Serialize(accountData, JsonSerializerOptions.Default);
